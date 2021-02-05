@@ -1,6 +1,6 @@
 class Product{
   String pName;
-  int Pcost;
+  String Pcost;
 
   Product(this.pName, this.Pcost);
 

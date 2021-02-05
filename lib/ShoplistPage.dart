@@ -16,7 +16,8 @@ class StateClass extends State<ShoplistPage> {
   var key = GlobalKey<FormState>();
   String urunAdi;
   List productInfo;
-  List allProducts;
+  List productPriceInfo;
+  List<Product> allProducts;
   int fiyat = 0;
 
   @override
@@ -28,8 +29,9 @@ class StateClass extends State<ShoplistPage> {
   @override
   Widget build(BuildContext context) {
     productInfo = verileriCek();
-
+    productPriceInfo=fiyatiCek();
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text("Make Your List"),
         backgroundColor: Colors.cyan.shade300,
@@ -40,10 +42,13 @@ class StateClass extends State<ShoplistPage> {
           if (key.currentState.validate()) {
             key.currentState.save();
           }
+
         },
         child: Icon(Icons.add),
       ),
-      body: Container(
+      body:
+      Container(
+
           child: Form(
               key: key,
               // ignore: deprecated_member_use
@@ -60,10 +65,10 @@ class StateClass extends State<ShoplistPage> {
                     onSaved: (alinanUrun) {
                       urunAdi = alinanUrun;
                       setState(() {
-                        allProducts.add(new Product(urunAdi, urunMiktari));
+                        allProducts.add(new Product(urunAdi.toString(), urunMiktari.toString()));
                       });
                       setState(() {
-                        fiyat = 0;
+                      //  fiyat = 0;
                         fiyatiHesapla();
                       });
                     },
@@ -89,6 +94,24 @@ class StateClass extends State<ShoplistPage> {
                       }),
                 ),
                 sonuc(),
+                Container(
+                  width: double.infinity,
+                  height: MediaQuery
+                      .of(context)
+                      .size
+                      .height / 1.89,
+                  child:ListView.builder(
+                      itemCount: allProducts.length,
+                      itemBuilder: (context,int index) {
+                        return Card(
+                          child: ListTile(
+                            leading: Icon(Icons.shopping_cart_outlined),
+                            title: Text("ürün adi : "+ allProducts[index].pName  +  "adet : "  +  allProducts[index].Pcost ),
+                          ),
+                        );
+                  }),
+
+                )
 
               ]))),
     );
@@ -98,7 +121,7 @@ class StateClass extends State<ShoplistPage> {
     List<DropdownMenuItem> menuItems = [];
     for (int i = 1; i < 11; i++) {
       DropdownMenuItem dropdownMenuItem =
-          DropdownMenuItem(child: Text("$i"), value: i);
+      DropdownMenuItem(child: Text("$i"), value: i);
       menuItems.add(dropdownMenuItem);
     }
     return menuItems;
@@ -108,13 +131,16 @@ class StateClass extends State<ShoplistPage> {
     return Center(
       child: Container(
         width: double.infinity,
-        height: MediaQuery.of(context).size.height / 8,
+        height: MediaQuery
+            .of(context)
+            .size
+            .height / 8,
         color: Colors.pink.shade200,
         child: Center(
             child: Text(
-          "toplam tutar : $fiyat",
-          style: TextStyle(fontSize: 30, color: Colors.white),
-        )),
+              "toplam tutar : $fiyat",
+              style: TextStyle(fontSize: 30, color: Colors.white),
+            )),
       ),
     );
   }
@@ -124,15 +150,15 @@ class StateClass extends State<ShoplistPage> {
     Prices pricess = new Prices();
     for (int i = 0; i < (pricess.names.length); i++) {
       productInfos.add(pricess.names[i]);
-      productInfos.add(pricess.prices[i].toString());
     }
     return productInfos;
   }
 
+
   int fiyatiHesapla() {
-    for (int i = 0; i < productInfo.length; i++) {
+    for (int i = 0; i < productPriceInfo.length; i++) {
       if (urunAdi == productInfo[i]) {
-        fiyat = int.parse(productInfo[i + 1]) * urunMiktari;
+        fiyat += int.parse(productPriceInfo[i].toString()) * urunMiktari;
       }
     }
     print(fiyat);
@@ -140,6 +166,18 @@ class StateClass extends State<ShoplistPage> {
   }
 
   Widget eklenenUrunleriListele() {
-    return Card();
+  }
+
+  List fiyatiCek() {
+    List productInfos2 = [];
+    Prices prices = new Prices();
+    for (int i = 0; i < (prices.names.length); i++) {
+      productInfos2.add(prices.prices[i]);
+
+    }
+    return productInfos2;
+
+
+
   }
 }
